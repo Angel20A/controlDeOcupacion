@@ -1,0 +1,51 @@
+.progress-bar{
+    &,
+    &::before,
+    &::after {
+        width: 20rem;
+        height: 20rem;
+        border-radius: 50%;
+    };
+
+    position: relative;
+    transform: rotate(90deg); /*rotate(90deg)*/
+    margin: auto;
+    background: linear-gradient(
+        0deg,
+        #004455 50%, /*color blanco*/
+        #ebebeb 50% /*otro color blanco pero con transparencia*/
+    );
+
+    &::before,
+    &::after {
+        position:absolute;
+        top:0;
+        left: 0;
+        color: #004455;
+        text-align: center;
+    }
+    &::before{
+        content: "No.";
+        background: #fff content-box; /*content box hace que el background aparezca dentro del área en la que debería de aparecer*/
+        padding: .5em;
+        box-sizing: border-box;
+        font-size: 4rem;
+        line-height: 9rem;
+        transform: var(--rotateBefore, rotate(-90deg)); /*rotate(-90deg)*/
+    }
+    &::after{
+        content: var(--porcentaje, "50%"); /*"50%"*/
+        background: linear-gradient(
+            transparent 50%,
+            #fff 50%
+        );
+        transform: scale(1.1) var(--rotateAfter, rotate(-90deg)); /*rotate(-90deg)*/
+        line-height: 22rem;
+    }
+}
+
+.progress-text{
+    position: absolute;
+    color: greenyellow;
+    transform: var(--text, rotate(-105deg));
+}

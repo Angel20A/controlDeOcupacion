@@ -1,0 +1,33 @@
+.form-login{
+    width: 300px;
+    text-align: center;
+    
+    position: relative;
+    z-index: 2;
+    margin-top: 10%; /*mitad de la altura del div*/
+    box-shadow: -5vh 5vh 20vh black;
+    border: white 1vh solid;
+}
+#main{
+    min-height: 100vh;
+    position: relative;
+    overflow: auto; /*Evita que los margenes se colapsen y que el form-login no haga un margen */
+}
+video{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.capa-bg{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1c1c1d;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+}
