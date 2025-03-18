@@ -9,7 +9,7 @@ async function tokenExistence(){
         window.location.href = "login.html"
     };
 };
-tokenExistence();
+//tokenExistence();
 
 //valida el token si aún está vencido
 async function tokenValidation(){
@@ -28,7 +28,7 @@ async function tokenValidation(){
     }
     
 };
-tokenValidation();
+//tokenValidation();
 
 
 async function closeDiv(button){
@@ -142,9 +142,16 @@ async function deleteUsuario(){
 //deleteUsuario();
 
 async function progressBarData(porcentaje){
-    const grados = porcentaje/100 * 180;
-    console.log(grados);
-    const progress = document.querySelector(".progress-bar");
+    if(porcentaje <= 100){
+        const grados = porcentaje/100 * 180;
+        console.log(grados);
+        const progress = document.querySelector(".progress");
+        progress.style.setProperty("--grados", `rotate(${grados}deg)`);
+    }else{
+        console.log("Porcentaje debe ser menor a 100");
+    }
+    
+    /*const progress = document.querySelector(".progress-bar");
     
     console.log(progress);
     
@@ -155,7 +162,53 @@ async function progressBarData(porcentaje){
     progress.style.setProperty("--rotateAfter" ,`rotate(-${grados}deg)`); ////se rota el transform del after utilizando la variable --after
 
     progress.style.setProperty("--porcentaje", `"${porcentaje}%"`);
-    document.getElementById("progress-text").style.setProperty("--text", `-"${porcentaje}%"`);
+    document.getElementById("progress-text").style.setProperty("--text", `-"${grados}deg"`);*/
 }
 
-progressBarData(100);
+//progressBarData(90);
+
+async function progressBar(contador, limInferior, limSuperior){
+    const cont = document.getElementById(contador).value;
+    const inferior = document.getElementById(limInferior).value;
+    const superior = document.getElementById(limSuperior).value;
+
+    
+    //si el limite inferior o superior es menor a 0
+    if(inferior < 0 || superior <=0){
+        console.log("limite inferior y/o superior deben ser positivos. O superior no debe ser 0.");
+    }else{
+        //si el limite inferior es mayor al superior
+        console.log("inferior:" + inferior);
+        console.log("superior" + superior);
+        if(inferior > superior){
+            console.log("El limite inferior no puede ser mayor al superor.")
+        }else{
+            const h3Inferior = document.getElementById('limInferior');
+            const h3Superior = document.getElementById('limSuperior');
+            const h2Cantidad = document.getElementById('cantidad');
+            var porcentaje;
+            
+
+            if(cont == ""){
+                console.log("No hay valor en el contador");
+                h2Cantidad.innerHTML = "0";
+
+            }else{ //si el contador tiene un valor
+                h2Cantidad.innerHTML = cont;
+                porcentaje = Math.round((cont * 100) / superior);
+                progressBarData(porcentaje);
+            }
+
+            //si el limite inferior está vacio
+            if(inferior == ""){
+                h3Inferior.innerHTML = "0";
+            }else{
+                h3Inferior.innerHTML = inferior;
+                porcentaje = Math.round((inferior * 100) / superior);
+                progressBarData(porcentaje);
+            }
+            h3Superior.innerHTML = superior;
+            
+        }
+    }
+}
