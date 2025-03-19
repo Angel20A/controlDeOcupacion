@@ -1,5 +1,6 @@
 use controlOcupacion
 
+-- USUARIO
 create table usuario(
 	idUsuario int primary key identity,
 	nombre varchar(50) not null,
@@ -42,3 +43,15 @@ as
 	end
 
 exec sp_login @usuario='juanp35', @contrasena='perez11232323'
+
+-- LECTORES
+create table devices(
+	id varchar(8) primary key not null,
+	nombre varchar(40) not null
+)
+
+select*from devices
+
+insert into devices(id, nombre) values
+('55442211', 'XP2 Main Exit Device (192.168.0.25)'),
+('55441122', 'XS2 Main Entrance Device (192.168.0.35)')
