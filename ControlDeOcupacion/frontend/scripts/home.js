@@ -243,3 +243,23 @@ async function resetearCuenta(checkbox){
         console.log('no está seleccionado.');
     }
 }
+
+async function getDevices(){
+    try{
+        const res = await instance.get("/devices");
+        console.log(res.data);
+    }catch(error){
+        console.log(error.response.data);
+        //span.innerHTML += '<p>' + error + '</p>';
+    }
+}
+
+async function getDevicesId(){
+    try{
+        const res = await instance.get("/devices/" + id)
+        console.log(res.data);
+    }catch(error){
+        console.log(error.response.data);
+        //span.innerHTML += '<p>' + error + '</p>';
+    }
+}
