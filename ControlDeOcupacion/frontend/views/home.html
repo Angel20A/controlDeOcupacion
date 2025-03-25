@@ -36,9 +36,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a id="btnDoors" class="accordion-button collapsed nav-link text-light" onclick="getDevices(); return false;" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDoors" aria-expanded="false" aria-controls="collapseDoors">
+                        <button id="btnDoors" class="accordion-button collapsed nav-link text-light" onclick="getDevices('entradaEntradaLabel', 'entradaSalidaLabel', 'salidaEntradaLabel', 'salidaSalidaLabel'); return false;" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDoors" aria-expanded="false" aria-controls="collapseDoors">
                             Dispositivos/Puertas. <i class="bi bi-door-closed-fill"></i>
-                        </a>
+                        </button>
                     </li>
                     
                     <button class="btn btn-outline-danger" onclick="location.href='login.html'"><i class="bi bi-box-arrow-right"></i> Salir</button>
@@ -161,14 +161,14 @@
                         <div class="card-body">
                             <h2>Entrada.</h2>
                             <div class="form-check" id="entradaEntrada" style="display: block;">
-                                <input class="form-check-input" type="checkbox" id="entradaEntradaCheck" onchange="showHideCheck('salidaEntrada'); return false;" value="">
-                                <label class="form-check-label" for="entradaEntradaCheck" >
+                                <input class="form-check-input" type="checkbox" id="entradaEntradaCheck" onchange="setCheckedButtons('entradaEntradaCheck'); showHideCheck('salidaEntrada'); return false;" value="">
+                                <label class="form-check-label" for="entradaEntradaCheck" id="entradaEntradaLabel">
                                   Entrada principal
                                 </label>
                             </div>
                             <div class="form-check" id="entradaSalida" style="display: block;">
-                                <input class="form-check-input" type="checkbox" id="entradaSalidaCheck" onchange="showHideCheck('salidaSalida'); return false;" value="">
-                                <label class="form-check-label" for="entradaSalidaCheck">
+                                <input class="form-check-input" type="checkbox" id="entradaSalidaCheck" onchange="setCheckedButtons('entradaSalidaCheck'); showHideCheck('salidaSalida'); return false;" value="">
+                                <label class="form-check-label" for="entradaSalidaCheck" id="entradaSalidaLabel">
                                   Salida principal
                                 </label>
                             </div>
@@ -180,14 +180,14 @@
                         <div class="card-body">
                             <h2>Salida.</h2>
                             <div class="form-check" id="salidaEntrada" style="display: block;">
-                                <input class="form-check-input" type="checkbox" id="salidaEntradaCheck" onchange="showHideCheck('entradaEntrada'); return false;" value="">
-                                <label class="form-check-label" for="salidaEntradaCheck">
+                                <input class="form-check-input" type="checkbox" id="salidaEntradaCheck" onchange="setCheckedButtons('salidaEntradaCheck'); showHideCheck('entradaEntrada'); return false;" value="">
+                                <label class="form-check-label" for="salidaEntradaCheck" id="salidaEntradaLabel">
                                   Entrada principal
                                 </label>
                             </div>
                             <div class="form-check" id="salidaSalida" style="display: block;">
-                                <input class="form-check-input" type="checkbox" id="salidaSalidaCheck" onchange="showHideCheck('entradaSalida'); return false;" value="">
-                                <label class="form-check-label" for="salidaSalidaCheck">
+                                <input class="form-check-input" type="checkbox" id="salidaSalidaCheck" onchange="setCheckedButtons('salidaSalidaCheck'); showHideCheck('entradaSalida'); return false;" value="">
+                                <label class="form-check-label" for="salidaSalidaCheck" id="salidaSalidaLabel">
                                   Salida principal
                                 </label>
                             </div>

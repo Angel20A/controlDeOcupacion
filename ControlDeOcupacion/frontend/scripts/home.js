@@ -30,6 +30,12 @@ async function tokenValidation(){
 };
 //tokenValidation();
 
+//setear los devices seleccionados por si la página se recarga
+const entranceDevice = localStorage.getItem("EntranceDevice");
+document.getElementById(entranceDevice).click();
+const exitDevice = localStorage.getItem("ExitDevice");
+document.getElementById(exitDevice).click();
+
 
 async function closeDiv(button){
     document.getElementById(button).click();
@@ -47,11 +53,33 @@ async function hideButtons(button, button2){
 
 async function showHideCheck(hide){
     const check = document.getElementById(hide);
+    //console.log(check);
 
     if(check.style.display === "none"){
         check.style.display = "block";
     }else{
         check.style.display = "none";
+    }
+}
+
+async function setCheckedButtons(check){
+    const button = document.getElementById(check);
+    console.log(button.id);
+    console.log(button.checked);
+
+    //si el botón se selecciona
+    if(button.checked == true){
+        if(button.id == "entradaEntradaCheck" || button.id == "salidaEntradaCheck"){
+            localStorage.setItem("EntranceDevice", button.id);    
+        }else if(button.id == "entradaSalidaCheck" || button.id == "salidaSalidaCheck"){
+            localStorage.setItem("ExitDevice", button.id);
+        }
+    }else if(button.checked == false){ //si el botón se deselecciona
+        if(button.id == "entradaEntradaCheck" || button.id == "salidaEntradaCheck"){
+            localStorage.setItem("EntranceDevice", "");    
+        }else if(button.id == "entradaSalidaCheck" || button.id == "salidaSalidaCheck"){
+            localStorage.setItem("ExitDevice", "");
+        }
     }
 }
 
@@ -244,12 +272,33 @@ async function resetearCuenta(checkbox){
     }
 }
 
-async function getDevices(){
+async function getDevices(entradaEntrada, entradaSalida, salidaEntrada, salidaSalida){
     try{
         const res = await instance.get("/devices");
         console.log(res.data);
+        const deviceMain = res.data[0];
+        const deviceExit = res.data[1];
+        console.log(deviceMain);
+        console.log(deviceExit);
+
+        const elementEntradaEntrada = document.getElementById(entradaEntrada);
+        elementEntradaEntrada.innerText = deviceMain.nombre;
+        document.getElementById("entradaEntradaCheck").value = deviceMain.id;
+
+        const elementEntradaSalida = document.getElementById(entradaSalida);
+        elementEntradaSalida.innerText = deviceExit.nombre;
+        document.getElementById("entradaSalidaCheck").value = deviceExit.id;
+
+        const elementSalidaEntrada = document.getElementById(salidaEntrada);
+        elementSalidaEntrada.innerText = deviceMain.nombre;
+        document.getElementById("salidaEntradaCheck").value = deviceMain.id;
+
+        const elementSalidaSalida = document.getElementById(salidaSalida);
+        elementSalidaSalida.innerText = deviceExit.nombre;
+        document.getElementById("salidaSalidaCheck").value = deviceExit.id;
+        
     }catch(error){
-        console.log(error.response.data);
+        console.log(error);
         //span.innerHTML += '<p>' + error + '</p>';
     }
 }
