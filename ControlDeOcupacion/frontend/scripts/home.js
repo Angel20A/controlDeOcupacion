@@ -30,13 +30,6 @@ async function tokenValidation(){
 };
 //tokenValidation();
 
-//setear los devices seleccionados por si la página se recarga
-const entranceDevice = localStorage.getItem("EntranceDevice");
-document.getElementById(entranceDevice).click();
-const exitDevice = localStorage.getItem("ExitDevice");
-document.getElementById(exitDevice).click();
-
-
 async function closeDiv(button){
     document.getElementById(button).click();
 }
@@ -62,7 +55,7 @@ async function showHideCheck(hide){
     }
 }
 
-async function setCheckedButtons(check){
+/*async function setCheckedButtons(check){
     const button = document.getElementById(check);
     console.log(button.id);
     console.log(button.checked);
@@ -78,6 +71,29 @@ async function setCheckedButtons(check){
         if(button.id == "entradaEntradaCheck" || button.id == "salidaEntradaCheck"){
             localStorage.setItem("EntranceDevice", "");    
         }else if(button.id == "entradaSalidaCheck" || button.id == "salidaSalidaCheck"){
+            localStorage.setItem("ExitDevice", "");
+        }
+    }
+}*/
+
+async function setCheckedButtons(check){
+    const button = document.getElementById(check);
+    console.log(button);
+    const id = button.id.split("-");
+
+    //si el botón se selecciona
+    if(button.checked == true){
+        console.log(button.id + " botón está seleccionado.");
+        if(button.id == (id[0] + "-EntradaCheckEntrada") || button.id == (id[0] + "-SalidaCheckEntrada")){
+            localStorage.setItem("EntranceDevice", button.id);
+        }else if(button.id == (id[0] + "-EntradaCheckSalida") || button.id == (id[0] + "-SalidaCheckSalida")){
+            localStorage.setItem("ExitDevice", button.id);
+        }
+    }else if(button.checked == false){
+        console.log(button.id + " botón no está seleccionado.");
+        if(button.id == (id[0] + "-EntradaCheckEntrada") || button.id == (id[0] + "-SalidaCheckEntrada")){
+            localStorage.setItem("EntranceDevice", "");
+        }else if(button.id == (id[0] + "-EntradaCheckSalida") || button.id == (id[0] + "-SalidaCheckSalida")){
             localStorage.setItem("ExitDevice", "");
         }
     }
@@ -272,7 +288,7 @@ async function resetearCuenta(checkbox){
     }
 }
 
-async function getDevices(entradaEntrada, entradaSalida, salidaEntrada, salidaSalida){
+/*async function getDevices(entradaEntrada, entradaSalida, salidaEntrada, salidaSalida){
     try{
         const res = await instance.get("/devices");
         console.log(res.data);
@@ -301,7 +317,104 @@ async function getDevices(entradaEntrada, entradaSalida, salidaEntrada, salidaSa
         console.log(error);
         //span.innerHTML += '<p>' + error + '</p>';
     }
+}*/
+
+async function getDevices(){
+    try{
+        const res = await instance.get("/devices");
+        console.log(res.data);
+        //const deviceMain = res.data[0];
+        //const deviceExit = res.data[1];
+
+        const cardEntrada = document.getElementById("cardEntrada");
+        const cardSalida = document.getElementById("cardSalida");
+
+        var count = 0;
+        res.data.forEach(element => {
+            console.log(element);
+            var tipoDevice;
+            if(count == 0){
+                tipoDevice = "Entrada";
+            }else if(res.data[1]){
+                tipoDevice = "Salida";
+            }
+
+            //creación de divs padres para insertar los ckeckbox
+            const divEntrada = document.createElement("div");
+                divEntrada.classList.add("form-check");
+                divEntrada.style.display = "block";
+                divEntrada.id = element.id + "-Entrada" + tipoDevice;
+
+            const divSalida = document.createElement("div");
+                divSalida.classList.add("form-check");
+                divSalida.style.display = "block";
+                divSalida.id = element.id + "-Salida" + tipoDevice;
+            
+            //creación de los checkbox
+            const elementEntrada = document.createElement("input");
+                elementEntrada.classList.add("form-check-input");
+                elementEntrada.type = "checkbox";
+                elementEntrada.id = element.id + "-EntradaCheck" + tipoDevice;
+
+            const elementSalida = document.createElement("input");
+                elementSalida.classList.add("form-check-input");
+                elementSalida.type = "checkbox";
+                elementSalida.id = element.id + "-SalidaCheck" + tipoDevice;
+
+            //agregar evento change a los checkbox
+            elementEntrada.addEventListener("change", function(){
+                setCheckedButtons(element.id + "-EntradaCheck" + tipoDevice); 
+                showHideCheck(element.id + "-Salida" + tipoDevice);
+            });
+            elementSalida.addEventListener("change", function(){
+                setCheckedButtons(element.id + "-SalidaCheck" + tipoDevice); 
+                showHideCheck(element.id + "-Entrada" + tipoDevice);
+            });
+
+            //creación de los labels que pertenecen a cada checkbox
+            const labelEntrada = document.createElement("label");
+                labelEntrada.classList.add("form-check-label");
+                labelEntrada.setAttribute("for", (element.id + "-EntradaCheck" + tipoDevice));
+                labelEntrada.id = element.id + "-EntradaLabel";
+                labelEntrada.innerHTML = element.nombre;
+
+            const labelSalida = document.createElement("label")
+                labelSalida.classList.add("form-check-label");
+                labelSalida.setAttribute("for", (element.id + "-SalidaCheck" + tipoDevice));
+                labelSalida.id = element.id + "-SalidaLabel";
+                labelSalida.innerHTML = element.nombre;
+
+            //agregar los checkbox y labels a los divs
+            divEntrada.appendChild(elementEntrada);
+            divEntrada.appendChild(labelEntrada);
+
+            divSalida.appendChild(elementSalida);
+            divSalida.appendChild(labelSalida);
+
+            //agregar los divs a las cards
+            cardEntrada.appendChild(divEntrada);
+            cardSalida.appendChild(divSalida);
+
+            count ++;
+        });
+
+
+        //setear los devices seleccionados por si la página se recarga
+        const entranceDevice = localStorage.getItem("EntranceDevice");
+        console.log(entranceDevice);
+        const buttonEntrance = document.getElementById(entranceDevice);
+        console.log(buttonEntrance);
+        buttonEntrance.click();
+        const exitDevice = localStorage.getItem("ExitDevice");
+        console.log(exitDevice);
+        const buttonExit = document.getElementById(exitDevice);
+        buttonExit.click();
+    }catch(error){
+        console.log(error);
+    }
 }
+getDevices();
+
 
 async function getDevicesId(){
     try{
