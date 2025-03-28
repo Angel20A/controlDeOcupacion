@@ -3,6 +3,17 @@ const instance = axios.create({
     baseURL: URL_API,
 });
 
+const ws = new WebSocket("wss://localhost:3000/devices");
+ws.addEventListener("open", ()=>{
+    console.log("estamos conectados!");
+});
+ws.addEventListener("message", (message) => {
+    //console.log(JSON.parse(message.data));
+    const device = JSON.parse(message.data);
+    console.log(device.data.Event.device_id);
+    progressBarWS(device.data.Event.device_id);
+})
+
 //validar si el token existe en el local storage
 async function tokenExistence(){
     if(!localStorage.getItem('token')){
@@ -259,6 +270,52 @@ async function progressBar(contador, limInferior, limSuperior){
     }
 }
 
+async function progressBarWS(data){
+    const deviceEntrada = localStorage.getItem("EntranceDevice");
+    const deviceSalida = localStorage.getItem("ExitDevice");
+    console.log(deviceEntrada);
+    console.log(deviceSalida);
+
+    if(deviceEntrada !== "" && deviceSalida !== ""){
+        const elementEntrada = document.getElementById(deviceEntrada);
+        const elementSalida = document.getElementById(deviceSalida);
+
+        const idElementEntrada = elementEntrada.id.split("-");
+        const idElementSalida = elementSalida.id.split("-");
+
+        const cantidad = document.getElementById('cantidad');
+        const limiteInferior = document.getElementById('limInferior').textContent;
+        const limiteSuperior = document.getElementById('limSuperior').textContent;
+        if(limiteSuperior !== 0){
+            console.log("Limite Superior:" + limiteSuperior);
+            //entrada = -EntradaCheckEntrada, -EntradaCheckSalida
+            //salida = -SalidaCheckEntrada, -SalidaCheckSalida
+            console.log(data.id);
+            console.log(idElementEntrada[0]);
+            console.log(idElementSalida[0]);
+            //console.log(idElementEntrada[0]);
+            
+            if((data.id + ("-EntradaCheckEntrada")) == elementEntrada.id || (data.id + ("-EntradaCheckSalida")) == elementSalida.id){
+                cantidad.textContent = parseInt(cantidad.textContent) + 1;
+                console.log(cantidad.textContent);
+
+            }else if((data.id + ("-SalidaCheckEntrada")) == elementEntrada.id || (data.id + ("-SalidaCheckSalida")) == elementSalida.id){
+                
+                cantidad.textContent = parseInt(cantidad.textContent) - 1;
+                console.log(cantidad.textContent);
+
+            }
+
+            const porcentaje = Math.round((cantidad.textContent * 100) / limiteSuperior);
+            progressBarData(porcentaje);
+            //si el id del dispositivo es igual al id del dispositivo de entrada
+            /*if(data.id == idElementEntrada[0]){
+            }else if(data.id == idElementSalida[0]){ //si el id del dispositivo es igual al id del dispositivo de salida
+            }*/
+        }
+    }
+}
+
 async function resetearCuenta(checkbox){
     const check = document.getElementById(checkbox).checked;
     console.log(check);
@@ -334,10 +391,11 @@ async function getDevices(){
             console.log(element);
             var tipoDevice;
             if(count == 0){
-                tipoDevice = "Entrada";
-            }else if(res.data[1]){
                 tipoDevice = "Salida";
+            }else{
+                tipoDevice = "Entrada";
             }
+            console.log(tipoDevice);
 
             //creación de divs padres para insertar los ckeckbox
             const divEntrada = document.createElement("div");
@@ -349,7 +407,7 @@ async function getDevices(){
                 divSalida.classList.add("form-check");
                 divSalida.style.display = "block";
                 divSalida.id = element.id + "-Salida" + tipoDevice;
-            
+
             //creación de los checkbox
             const elementEntrada = document.createElement("input");
                 elementEntrada.classList.add("form-check-input");
@@ -395,6 +453,9 @@ async function getDevices(){
             cardEntrada.appendChild(divEntrada);
             cardSalida.appendChild(divSalida);
 
+            console.log(cardEntrada);
+            console.log(cardSalida);
+
             count ++;
         });
 
@@ -404,11 +465,16 @@ async function getDevices(){
         console.log(entranceDevice);
         const buttonEntrance = document.getElementById(entranceDevice);
         console.log(buttonEntrance);
-        buttonEntrance.click();
+        if(buttonEntrance !== null){
+            buttonEntrance.click();
+        }
+
         const exitDevice = localStorage.getItem("ExitDevice");
         console.log(exitDevice);
         const buttonExit = document.getElementById(exitDevice);
-        buttonExit.click();
+        if(buttonExit !== null){
+            buttonExit.click();
+        }
     }catch(error){
         console.log(error);
     }

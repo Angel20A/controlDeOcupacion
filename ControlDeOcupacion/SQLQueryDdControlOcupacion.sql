@@ -51,7 +51,9 @@ create table devices(
 )
 
 select*from devices
-
+truncate table devices;
 insert into devices(id, nombre) values
-('55442211', 'XP2 Main Exit Device (192.168.0.25)'),
-('55441122', 'XS2 Main Entrance Device (192.168.0.35)')
+('55441122', 'XP2 Main Exit Device (192.168.0.25)'),
+('55442211', 'XS2 Main Entrance Device (192.168.0.35)')
+
+

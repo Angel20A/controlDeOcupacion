@@ -2,7 +2,8 @@ import app from "./app.js"
 import { PORT } from "./config.js"
 import fs from "fs"
 import https from "https"
-import { WebSocketServer } from "ws"
+import WebSocket, { WebSocketServer } from "ws"
+//const WebSocket = require('ws');
 import { getDevices } from "./controllers/devices.controller.js"
 import devicesRoutes from "./routes/devices.routes.js"
 
@@ -59,17 +60,19 @@ server.listen(PORT, ()=>{
 
 
 
-const wss = new WebSocketServer({server: server, path:'/devices'});
+const wss = new WebSocketServer({server: server, path:'/devices'});//WebSocketServer({server: server, path:'/devices'});
 let devices = [{id: "55442211" ,name: "XP2 Main Exit Device (192.168.0.25)"},{id: "55441122",name: "XS2 Main Entrance Device (192.168.0.35)"}]
 let base = {data:{Event: {device_id: null }}}
 
 
 let Send2Client = (opc) => {
     base.data.Event.device_id = devices[opc-1];
-    if(wss){ 
+    if(wss){
         wss.clients.forEach((client, req) => {
             console.log("Sent to: ", req._socket._peername);
-            if (client.readyState === WSserver.OPEN) {
+            console.log("Client:", client.readyState);
+            console.log(WebSocket.OPEN);
+            if (client.readyState === WebSocket.OPEN) {
               client.send(JSON.stringify(base));
             }
         });
@@ -85,7 +88,7 @@ let wsServer = () => {
         ws.on('error', (err)=>{
             console.log("Error happenned with Client: " + req.socket.remoteAddress + ":" + req.socket.remotePort + ", error description: " + err );
         });
-        // ws.send(data);
+        //ws.send(data);
     });
 }
 
