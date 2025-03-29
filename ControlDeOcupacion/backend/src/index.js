@@ -63,7 +63,9 @@ server.listen(PORT, ()=>{
 const wss = new WebSocketServer({server: server, path:'/devices'});//WebSocketServer({server: server, path:'/devices'});
 let devices = [{id: "55442211" ,name: "XP2 Main Exit Device (192.168.0.25)"},{id: "55441122",name: "XS2 Main Entrance Device (192.168.0.35)"}]
 let base = {data:{Event: {device_id: null }}}
-
+var cantidad = 0;
+var limInferior = 0;
+var limSuperior = 0;
 
 let Send2Client = (opc) => {
     base.data.Event.device_id = devices[opc-1];
@@ -73,7 +75,7 @@ let Send2Client = (opc) => {
             console.log("Client:", client.readyState);
             console.log(WebSocket.OPEN);
             if (client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify(base));
+                client.send(JSON.stringify(base));
             }
         });
     }    
@@ -82,6 +84,13 @@ let Send2Client = (opc) => {
 let wsServer = () => {
     wss.on('connection', (ws, req) => {
         console.log("New Connection from: ", req.socket.remoteAddress+ ":"+ req.socket.remotePort);
+        const datos = {limInferior: limInferior, 
+            limSuperior: limSuperior, 
+            cantidad: cantidad};
+        const datosJson = JSON.stringify(datos);
+        //ws.send(datosJson);
+        ws.send(datosJson);
+
         ws.on('close', (code, reason)=>{
             console.log("Client: " + req.socket.remoteAddress + ":" + req.socket.remotePort + ", with code: "+ code + " and reason: " + reason);
         });
@@ -89,6 +98,15 @@ let wsServer = () => {
             console.log("Error happenned with Client: " + req.socket.remoteAddress + ":" + req.socket.remotePort + ", error description: " + err );
         });
         //ws.send(data);
+        ws.on('message', (message) => {
+            const variables = JSON.parse(message);
+            cantidad = variables.cantidad;
+            limInferior = variables.limInferior;
+            limSuperior = variables.limSuperior;
+            console.log("Cantidad : " + cantidad);
+            console.log("Limite Inferior : " + limInferior);
+            console.log("Limite Superior : " + limSuperior);
+        })
     });
 }
 

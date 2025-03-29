@@ -1,3 +1,5 @@
+//import { json } from "stream/consumers";
+
 const URL_API = 'https://localhost:3000';
 const instance = axios.create({
     baseURL: URL_API,
@@ -6,13 +8,20 @@ const instance = axios.create({
 const ws = new WebSocket("wss://localhost:3000/devices");
 ws.addEventListener("open", ()=>{
     console.log("estamos conectados!");
+    
+    /*ws.addEventListener("message", (message) => {
+        console.log(message.data);
+    });*/
 });
 ws.addEventListener("message", (message) => {
     //console.log(JSON.parse(message.data));
     const device = JSON.parse(message.data);
+    console.log(device);
+    
+
     console.log(device.data.Event.device_id);
     progressBarWS(device.data.Event.device_id);
-})
+});
 
 //validar si el token existe en el local storage
 async function tokenExistence(){
@@ -268,6 +277,14 @@ async function progressBar(contador, limInferior, limSuperior){
     }else{
         h2Cantidad.innerHTML = "0";
     }
+
+    const variables = { limInferior: parseInt(h3Inferior.innerHTML), 
+        limSuperior: parseInt(h3Superior.innerHTML), 
+        cantidad: parseInt(h2Cantidad.innerHTML) };
+    
+    const variablesJSON = JSON.stringify(variables)
+    console.log(JSON.parse(variablesJSON));
+    ws.send(variablesJSON);
 }
 
 async function progressBarWS(data){
@@ -275,6 +292,7 @@ async function progressBarWS(data){
     const deviceSalida = localStorage.getItem("ExitDevice");
     console.log(deviceEntrada);
     console.log(deviceSalida);
+    console.log(data);
 
     if(deviceEntrada !== "" && deviceSalida !== ""){
         const elementEntrada = document.getElementById(deviceEntrada);
@@ -286,32 +304,57 @@ async function progressBarWS(data){
         const cantidad = document.getElementById('cantidad');
         const limiteInferior = document.getElementById('limInferior').textContent;
         const limiteSuperior = document.getElementById('limSuperior').textContent;
-        if(limiteSuperior !== 0){
+        if(limiteSuperior != 0){
             console.log("Limite Superior:" + limiteSuperior);
             //entrada = -EntradaCheckEntrada, -EntradaCheckSalida
             //salida = -SalidaCheckEntrada, -SalidaCheckSalida
             console.log(data.id);
             console.log(idElementEntrada[0]);
             console.log(idElementSalida[0]);
-            //console.log(idElementEntrada[0]);
-            
-            if((data.id + ("-EntradaCheckEntrada")) == elementEntrada.id || (data.id + ("-EntradaCheckSalida")) == elementSalida.id){
-                cantidad.textContent = parseInt(cantidad.textContent) + 1;
-                console.log(cantidad.textContent);
 
-            }else if((data.id + ("-SalidaCheckEntrada")) == elementEntrada.id || (data.id + ("-SalidaCheckSalida")) == elementSalida.id){
-                
-                cantidad.textContent = parseInt(cantidad.textContent) - 1;
-                console.log(cantidad.textContent);
-
-            }
-
-            const porcentaje = Math.round((cantidad.textContent * 100) / limiteSuperior);
-            progressBarData(porcentaje);
+            var cantValor = parseInt(cantidad.textContent);
+            console.log(cantValor);
             //si el id del dispositivo es igual al id del dispositivo de entrada
-            /*if(data.id == idElementEntrada[0]){
-            }else if(data.id == idElementSalida[0]){ //si el id del dispositivo es igual al id del dispositivo de salida
-            }*/
+            if((data.id + ("-EntradaCheckEntrada")) == elementEntrada.id || (data.id + ("-EntradaCheckSalida")) == elementSalida.id){
+                cantValor += 1;
+
+                if(cantValor > parseInt(limiteSuperior)){
+                    console.log("la cuenta manual no puede ser mayor al límite superior.");
+                    alert("la cuenta manual no puede ser mayor al límite superior.");
+                }else{
+                    if(cantValor > parseInt(limiteInferior)){
+                        const porcentaje = Math.round((cantValor * 100) / limiteSuperior);
+                        progressBarData(porcentaje);
+                    } 
+                    cantidad.textContent = cantValor;
+
+                    const variables = { limInferior: parseInt(limiteInferior), 
+                        limSuperior: parseInt(limiteSuperior), 
+                        cantidad: parseInt(cantidad.textContent) };
+                    
+                    const variablesJSON = JSON.stringify(variables)
+                    console.log(JSON.parse(variablesJSON));
+                    ws.send(variablesJSON);
+                }
+            }else if((data.id + ("-SalidaCheckEntrada")) == elementEntrada.id || (data.id + ("-SalidaCheckSalida")) == elementSalida.id){ //si el id del dispositivo es igual al id del dispositivo de salida
+                cantValor -= 1;
+
+                if(cantValor < 0 || cantValor < parseInt(limiteInferior)){
+                    console.log("la cuenta manual no puede ser menor al límite inferior.");
+                    alert("la cuenta manual no puede ser menor al límite inferior.");
+                }else{
+                    const porcentaje = Math.round((cantValor * 100) / limiteSuperior);
+                    progressBarData(porcentaje);
+                    cantidad.textContent = cantValor;
+                    const variables = { limInferior: parseInt(limiteInferior), 
+                        limSuperior: parseInt(limiteSuperior), 
+                        cantidad: parseInt(cantidad.textContent) };
+                    
+                    const variablesJSON = JSON.stringify(variables)
+                    console.log(JSON.parse(variablesJSON));
+                    ws.send(variablesJSON);
+                }
+            }
         }
     }
 }
@@ -334,7 +377,7 @@ async function resetearCuenta(checkbox){
         inferior.value = "";
         superior.value = "";
         
-        h2Cantidad.innerHTML = "";
+        h2Cantidad.innerHTML = 0; 
         h3Inferior.innerHTML = 0;
         h3Superior.innerHTML = 0;
         span.innerHTML = "";
@@ -480,6 +523,28 @@ async function getDevices(){
     }
 }
 getDevices();
+
+/*async function saveDevices(){
+    try{
+        //setear los devices seleccionados por si la página se recarga
+        const entranceDevice = localStorage.getItem("EntranceDevice");
+        console.log(entranceDevice);
+        const buttonEntrance = document.getElementById(entranceDevice);
+        console.log(buttonEntrance);
+        if(buttonEntrance !== null){
+            buttonEntrance.click();
+        }
+
+        const exitDevice = localStorage.getItem("ExitDevice");
+        console.log(exitDevice);
+        const buttonExit = document.getElementById(exitDevice);
+        if(buttonExit !== null){
+            buttonExit.click();
+        }
+    }catch(error){
+        console.log(error);
+    }
+}*/
 
 
 async function getDevicesId(){
