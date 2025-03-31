@@ -88,8 +88,9 @@ let wsServer = () => {
             limSuperior: limSuperior, 
             cantidad: cantidad};
         const datosJson = JSON.stringify(datos);
+        ws.send(datosJson);        
+
         //ws.send(datosJson);
-        ws.send(datosJson);
 
         ws.on('close', (code, reason)=>{
             console.log("Client: " + req.socket.remoteAddress + ":" + req.socket.remotePort + ", with code: "+ code + " and reason: " + reason);

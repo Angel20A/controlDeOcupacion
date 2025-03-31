@@ -4,7 +4,8 @@ const API_URL = 'https://localhost:3000';
 const instance = axios.create({
     baseURL: API_URL,
 });
-localStorage.clear();
+//localStorage.clear();
+localStorage.removeItem('token');
 
 function showDiv(idShow, idHide){
     document.getElementById(idShow).style.display = "block";

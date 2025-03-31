@@ -5,23 +5,34 @@ const instance = axios.create({
     baseURL: URL_API,
 });
 
+var inferior = 0;
+var superior = 0;
+var cantidad = 0;
 const ws = new WebSocket("wss://localhost:3000/devices");
 ws.addEventListener("open", ()=>{
     console.log("estamos conectados!");
-    
-    /*ws.addEventListener("message", (message) => {
-        console.log(message.data);
-    });*/
 });
-ws.addEventListener("message", (message) => {
-    //console.log(JSON.parse(message.data));
-    const device = JSON.parse(message.data);
-    console.log(device);
-    
 
-    console.log(device.data.Event.device_id);
-    progressBarWS(device.data.Event.device_id);
+ws.addEventListener("message", (message) => {
+    const device = JSON.parse(message.data);
+
+    if(device.data != undefined){
+        console.log(device.data.Event.device_id);
+        progressBarWS(device.data.Event.device_id);
+    }else{
+        console.log(device);
+        inferior = device.limInferior;
+        superior = device.limSuperior;
+        cantidad = device.cantidad;
+        document.getElementById('limiteInferior').value = inferior;
+        document.getElementById('limiteSuperior').value = superior;
+        document.getElementById('cuentaManual').value = cantidad;
+        progressBar('cuentaManual', 'limiteInferior', 'limiteSuperior');     
+    }
+
+    
 });
+
 
 //validar si el token existe en el local storage
 async function tokenExistence(){
@@ -29,7 +40,7 @@ async function tokenExistence(){
         window.location.href = "login.html"
     };
 };
-//tokenExistence();
+tokenExistence();
 
 //valida el token si aún está vencido
 async function tokenValidation(){
@@ -48,7 +59,7 @@ async function tokenValidation(){
     }
     
 };
-//tokenValidation();
+tokenValidation();
 
 async function closeDiv(button){
     document.getElementById(button).click();
@@ -74,27 +85,6 @@ async function showHideCheck(hide){
         check.style.display = "none";
     }
 }
-
-/*async function setCheckedButtons(check){
-    const button = document.getElementById(check);
-    console.log(button.id);
-    console.log(button.checked);
-
-    //si el botón se selecciona
-    if(button.checked == true){
-        if(button.id == "entradaEntradaCheck" || button.id == "salidaEntradaCheck"){
-            localStorage.setItem("EntranceDevice", button.id);    
-        }else if(button.id == "entradaSalidaCheck" || button.id == "salidaSalidaCheck"){
-            localStorage.setItem("ExitDevice", button.id);
-        }
-    }else if(button.checked == false){ //si el botón se deselecciona
-        if(button.id == "entradaEntradaCheck" || button.id == "salidaEntradaCheck"){
-            localStorage.setItem("EntranceDevice", "");    
-        }else if(button.id == "entradaSalidaCheck" || button.id == "salidaSalidaCheck"){
-            localStorage.setItem("ExitDevice", "");
-        }
-    }
-}*/
 
 async function setCheckedButtons(check){
     const button = document.getElementById(check);
@@ -388,36 +378,21 @@ async function resetearCuenta(checkbox){
     }
 }
 
-/*async function getDevices(entradaEntrada, entradaSalida, salidaEntrada, salidaSalida){
-    try{
-        const res = await instance.get("/devices");
-        console.log(res.data);
-        const deviceMain = res.data[0];
-        const deviceExit = res.data[1];
-        console.log(deviceMain);
-        console.log(deviceExit);
-
-        const elementEntradaEntrada = document.getElementById(entradaEntrada);
-        elementEntradaEntrada.innerText = deviceMain.nombre;
-        document.getElementById("entradaEntradaCheck").value = deviceMain.id;
-
-        const elementEntradaSalida = document.getElementById(entradaSalida);
-        elementEntradaSalida.innerText = deviceExit.nombre;
-        document.getElementById("entradaSalidaCheck").value = deviceExit.id;
-
-        const elementSalidaEntrada = document.getElementById(salidaEntrada);
-        elementSalidaEntrada.innerText = deviceMain.nombre;
-        document.getElementById("salidaEntradaCheck").value = deviceMain.id;
-
-        const elementSalidaSalida = document.getElementById(salidaSalida);
-        elementSalidaSalida.innerText = deviceExit.nombre;
-        document.getElementById("salidaSalidaCheck").value = deviceExit.id;
-        
-    }catch(error){
-        console.log(error);
-        //span.innerHTML += '<p>' + error + '</p>';
+async function temporizadorSesion(minutos){
+    const tiempo = document.getElementById(minutos).value;
+    console.log(tiempo);
+    if((tiempo >= 0) && (tiempo <= 60) && (tiempo != "")){
+        const tiempoSegundos = tiempo * 60;
+        console.log(tiempoSegundos);
+        setTimeout(() => {
+            alert("La sesión ha expirado.");
+            window.location.href = "login.html";
+        }, tiempoSegundos * 1000);
+    }else{
+        alert("El tiempo debe ser mayor a 0 y menor a 60 minutos.");
+        console.log("El tiempo debe ser mayor a 0 y menor a 60 minutos.");
     }
-}*/
+}
 
 async function getDevices(){
     try{
@@ -523,28 +498,6 @@ async function getDevices(){
     }
 }
 getDevices();
-
-/*async function saveDevices(){
-    try{
-        //setear los devices seleccionados por si la página se recarga
-        const entranceDevice = localStorage.getItem("EntranceDevice");
-        console.log(entranceDevice);
-        const buttonEntrance = document.getElementById(entranceDevice);
-        console.log(buttonEntrance);
-        if(buttonEntrance !== null){
-            buttonEntrance.click();
-        }
-
-        const exitDevice = localStorage.getItem("ExitDevice");
-        console.log(exitDevice);
-        const buttonExit = document.getElementById(exitDevice);
-        if(buttonExit !== null){
-            buttonExit.click();
-        }
-    }catch(error){
-        console.log(error);
-    }
-}*/
 
 
 async function getDevicesId(){

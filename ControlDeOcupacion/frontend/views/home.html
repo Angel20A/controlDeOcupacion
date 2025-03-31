@@ -105,8 +105,8 @@
                             </div>
                             <label for="timeout">Timeout de sesión (minutos)</label>
                             <div class="form-group input-group">
-                                <input type="number" class="form-control" id="timeout" onclick="showButtons('timeoutButton', 'timeoutButton2'); return false;" placeholder="Ingresa el tiempo">
-                                <button class="btn btn-outline-primary" type="button" id="timeoutButton" for="timeout" style="display: none;">Aceptar</button>
+                                <input type="number" class="form-control" id="timeout" onclick="showButtons('timeoutButton', 'timeoutButton2'); return false;" min="0" max="60" placeholder="Ingresa el tiempo">
+                                <button class="btn btn-outline-primary" type="button" id="timeoutButton" onclick="temporizadorSesion('timeout'); return false;" for="timeout" style="display: none;">Aceptar</button>
                                 <button class="btn btn-outline-danger" type="button" id="timeoutButton2" onclick="hideButtons('timeoutButton', 'timeoutButton2'); return false;" for="timeout" style="display: none;">Cancelar</button>
                             </div>
                         </form>
